@@ -1,0 +1,335 @@
+﻿@model Gradius.Models.DataManager.DataManagaerView
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<link rel="stylesheet" href="~/css/DataManager/DataManagerPage.css" />
+<link rel="stylesheet" href="~/css/App/AppPage.css" />
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="~/LTE/plugins/fontawesome-free/css/all.min.css">
+<!-- overlayScrollbars -->
+<link rel="stylesheet" href="~/LTE/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+<!-- Theme style -->
+<link rel="stylesheet" href="~/LTE/dist/css/adminlte.min.css">
+
+<link rel="stylesheet" href="~/LTE/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="~/LTE/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+<!-- Google Font: Source Sans Pro -->
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+<div class="card card-info">
+    <div class="card-header">
+        <h3 class="card-title">Line Chart</h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                <i class="fas fa-minus"></i>
+            </button>
+            <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div style="display:flex">
+            <div id="RawDataDiv">
+                <div class="callout callout-info">
+                    <h6>Base Simples</h6>
+                   
+                </div>
+                <label for="rawData">Importar Dados</label>
+                <div class="input-group" style="width:40%">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="rawData">
+                        <label class="custom-file-label" for="rawData">Escolher Arquivo</label>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <br />
+                    <label>Tipo de Importação</label><br />
+                    <select id="tipoImport" class="custom-select" style="width:40%">
+                        <option value="s">Substituir</option>
+                        <option value="c">Concatenar</option>
+
+                    </select>
+
+                </div>
+
+                <button onclick="uploadRawData()" class="btn btn-block btn-success" style="width:120px"><i class="fas fa-upload"></i> Enviar </button>
+                <br />
+                <button class="btn btn-block btn-info" style="width:200px" onclick="runGrouping()">Processar <i class="fas fa-angle-double-right"></i></button>
+            </div>
+            <div id="TransformedData">
+                <div class="callout callout-info">
+                    <h6>Base Agrupada</h6>
+
+                </div>
+                <label for="rawData">Importar Dados</label>
+                <div class="input-group" style="width:40%">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="tData">
+                        <label class="custom-file-label" for="tData">Escolher Arquivo</label>
+                    </div>
+
+                </div>
+                <div class="form-group">
+                    <br />
+                    <label>Tipo de Importação</label><br />
+                    <select id="tipoImportTransformed" class="custom-select" style="width:40%">
+                        <option value="s">Substituir</option>
+                        <option value="c">Concatenar</option>
+
+                    </select>
+
+                </div>
+
+                <button onclick="uploadTransformedData()" class="btn btn-block btn-success" style="width:120px"><i class="fas fa-upload"></i> Enviar </button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Detalhamento</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                <table id="transformedDataTable" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Valor</th>
+                            <th>Dia da Semana</th>
+                            <th>Mês</th>
+                            <th>Ano</th>
+                            <th>Pais</th>
+                            <th>Estado</th>
+                            <th>Cidade</th>
+                            <th>Distrito</th>
+                            <th> Quantidade </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (string[] row in Model.TransformedData.Table)
+                        {
+                            <tr>
+                                <td>@row[0]</td>
+                                <td>@row[1]</td>
+                                <td>@row[2]</td>
+                                <td>@row[3]</td>
+                                <td>@row[4]</td>
+                                <td>@row[5]</td>
+                                <td>@row[6]</td>
+                                <td>@row[7]</td>
+                                <td>@row[8]</td>
+                            </tr>
+                        }
+
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Valor</th>
+                            <th>Dia da Semana</th>
+                            <th>Mês</th>
+                            <th>Ano</th>
+                            <th>Pais</th>
+                            <th>Estado</th>
+                            <th>Cidade</th>
+                            <th>Distrito</th>
+                            <th> Quantidade </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+
+
+        <script src="~/js/Variables.js"></script>
+        <script src="~/js/Operations.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <script src="~/LTE/plugins/jquery/jquery.min.js"></script>
+        <!-- Bootstrap -->
+        <script src="~/LTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <!-- overlayScrollbars -->
+        <script src="~/LTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+        <!-- AdminLTE App -->
+        <script src="~/LTE/dist/js/adminlte.js"></script>
+        <!-- OPTIONAL SCRIPTS -->
+        <script src="~/LTE/dist/js/demo.js"></script>
+        <!-- PAGE PLUGINS -->
+        <!-- jQuery Mapael -->
+        <script src="~/LTE/plugins/jquery-mousewheel/jquery.mousewheel.js"></script>
+
+        <script src="~/LTE/plugins/raphael/raphael.min.js"></script>
+        <script src="~/LTE/plugins/jquery-mapael/jquery.mapael.min.js"></script>
+        <script src="~/LTE/plugins/jquery-mapael/maps/usa_states.min.js"></script>
+        <!-- ChartJS -->
+        <script src="~/LTE/plugins/chart.js/Chart.min.js"></script>
+        <!-- PAGE SCRIPTS -->
+        <script src="~/LTE/dist/js/pages/dashboard2.js"></script>
+
+        <script src="~/LTE/plugins/datatables/jquery.dataTables.min.js"></script>
+        <script src="~/LTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+        <script src="~/LTE/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+        <script src="~/LTE/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+
+        <script>
+    function uploadRawData() {
+        if (document.getElementById("tipoImport").value == "s") {
+            replaceRawData();
+        }
+        else {
+            concatRawData();
+        }
+    }
+
+    function replaceRawData() {
+        var formData = new FormData();
+        var files = document.getElementById("rawData").files;
+        for (var i = 0; i < files.length; i++) {
+            formData.append("rawData", files[i]);
+        }
+
+
+        $.ajax(
+            {
+                type: 'POST',
+                url: '../DataManager/UploadReplaceRawData?Id=' + @Model.Id,
+                dataType: 'html',
+                cache: false,
+                async: true,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+
+                    alert("Enviado Com Sucesso");
+                    location.reload();
+                },
+
+                data: formData
+
+            });
+    }
+
+    function concatRawData() {
+        var formData = new FormData();
+        var files = document.getElementById("rawData").files;
+        for (var i = 0; i < files.length; i++) {
+            formData.append("rawData", files[i]);
+        }
+
+
+        $.ajax(
+            {
+                type: 'POST',
+                url: '../DataManager/UploadConcatRawData?Id=' + @Model.Id,
+                dataType: 'html',
+                cache: false,
+                async: true,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+
+                    alert("Enviado Com Sucesso");
+                    location.reload();
+                },
+
+                data: formData
+
+            });
+    }
+
+
+    function uploadTransformedData() {
+        if (document.getElementById("tipoImportTransformed").value == "s") {
+            replaceTransformedData();
+        }
+        else {
+            concatTransformedData();
+        }
+    }
+
+    function replaceTransformedData() {
+        var formData = new FormData();
+        var files = document.getElementById("tData").files;
+        for (var i = 0; i < files.length; i++) {
+            formData.append("tData", files[i]);
+        }
+
+
+        $.ajax(
+            {
+                type: 'POST',
+                url: '../DataManager/UploadReplaceTransformedData?Id=' + @Model.Id,
+                dataType: 'html',
+                cache: false,
+                async: true,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+
+                    alert("Enviado Com Sucesso");
+                    location.reload();
+                },
+
+                data: formData
+
+            });
+    }
+
+    function concatTransformedData() {
+        var formData = new FormData();
+        var files = document.getElementById("tData").files;
+        for (var i = 0; i < files.length; i++) {
+            formData.append("tData", files[i]);
+        }
+
+
+        $.ajax(
+            {
+                type: 'POST',
+                url: '../DataManager/UploadConcatTransformedData?Id=' + @Model.Id,
+                dataType: 'html',
+                cache: false,
+                async: true,
+                contentType: false,
+                processData: false,
+                success: function (data) {
+
+                    alert("Enviado Com Sucesso");
+                    location.reload();
+                },
+
+                data: formData
+
+            });
+            }
+
+    function runGrouping() {
+         $.ajax(
+            {
+                type: 'POST',
+                 url: '../DataManager/Grouping?Id=@Model.Id',
+                dataType: 'html',
+                cache: false,
+                async: true,
+                 success: function (data) {
+                     location.reload();
+                    
+                    
+                },
+
+               
+
+            });
+            }
+        </script>
+
+        <script>
+            $("#transformedDataTable").DataTable({
+                "responsive": true,
+                "autoWidth": false,
+            });
+        </script>

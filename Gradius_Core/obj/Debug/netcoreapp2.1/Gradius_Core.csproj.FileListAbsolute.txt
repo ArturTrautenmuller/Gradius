@@ -1,0 +1,9 @@
+C:\Users\artur\source\repos\Gradius\Gradius_Core\bin\Debug\netcoreapp2.1\Gradius_Core.deps.json
+C:\Users\artur\source\repos\Gradius\Gradius_Core\bin\Debug\netcoreapp2.1\Gradius_Core.dll
+C:\Users\artur\source\repos\Gradius\Gradius_Core\bin\Debug\netcoreapp2.1\Gradius_Core.pdb
+C:\Users\artur\source\repos\Gradius\Gradius_Core\obj\Debug\netcoreapp2.1\Gradius_Core.csproj.CoreCompileInputs.cache
+C:\Users\artur\source\repos\Gradius\Gradius_Core\obj\Debug\netcoreapp2.1\Gradius_Core.AssemblyInfoInputs.cache
+C:\Users\artur\source\repos\Gradius\Gradius_Core\obj\Debug\netcoreapp2.1\Gradius_Core.AssemblyInfo.cs
+C:\Users\artur\source\repos\Gradius\Gradius_Core\obj\Debug\netcoreapp2.1\Gradius_Core.dll
+C:\Users\artur\source\repos\Gradius\Gradius_Core\obj\Debug\netcoreapp2.1\Gradius_Core.pdb
+C:\Users\artur\source\repos\Gradius\Gradius_Core\obj\Debug\netcoreapp2.1\Gradius_Core.csprojAssemblyReference.cache

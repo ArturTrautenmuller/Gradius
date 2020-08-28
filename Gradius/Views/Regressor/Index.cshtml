@@ -1,0 +1,114 @@
+﻿@model Gradius.Models.Regressor.RegressorView
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+
+<link rel="stylesheet" href="~/css/App/AppPage.css" />
+<!-- Font Awesome Icons -->
+<link rel="stylesheet" href="~/LTE/plugins/fontawesome-free/css/all.min.css">
+<!-- overlayScrollbars -->
+<link rel="stylesheet" href="~/LTE/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+<!-- Theme style -->
+<link rel="stylesheet" href="~/LTE/dist/css/adminlte.min.css">
+<!-- Google Font: Source Sans Pro -->
+<link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Regressores</h3>
+    </div>
+    <!-- /.card-header -->
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="width: 10px">#</th>
+                    <th>Id</th>
+                    <th>Filtro</th>
+                    <th style="width: 40px">Label</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int i = 1;
+                }
+                @foreach(Gradius_DataBaseLayer.Regressor regressor in Model.App.Regressors)
+                {
+                <tr>
+                    <td>@i</td>
+                    <td>@regressor.RegressorId</td>
+                    <td>@regressor.Filter</td>
+                    <td><span class="badge bg-danger">55%</span></td>
+                    <td><a onclick="trainRegressor('@regressor.RegressorId')"><i id="R-@regressor.RegressorId" class="fas fa-play"></i> <i id="P-@regressor.RegressorId" class="fas fa-pause" style="display:none"></i>  </a></td>
+
+                </tr>
+                    i++;
+                }
+               
+            </tbody>
+        </table>
+    </div>
+    <!-- /.card-body -->
+    
+</div>
+<!-- /.card -->
+
+
+
+
+
+
+
+
+
+<script src="~/js/Variables.js"></script>
+<script src="~/js/Operations.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script src="~/LTE/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="~/LTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- overlayScrollbars -->
+<script src="~/LTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+<!-- AdminLTE App -->
+<script src="~/LTE/dist/js/adminlte.js"></script>
+<!-- OPTIONAL SCRIPTS -->
+<script src="~/LTE/dist/js/demo.js"></script>
+<!-- PAGE PLUGINS -->
+<!-- jQuery Mapael -->
+<script src="~/LTE/plugins/jquery-mousewheel/jquery.mousewheel.js"></script>
+
+<script src="~/LTE/plugins/raphael/raphael.min.js"></script>
+<script src="~/LTE/plugins/jquery-mapael/jquery.mapael.min.js"></script>
+<script src="~/LTE/plugins/jquery-mapael/maps/usa_states.min.js"></script>
+<!-- ChartJS -->
+<script src="~/LTE/plugins/chart.js/Chart.min.js"></script>
+<!-- PAGE SCRIPTS -->
+<script src="~/LTE/dist/js/pages/dashboard2.js"></script>
+
+<script>
+    function trainRegressor(hash) {
+        document.getElementById("R-" + hash).style.display = "none";
+        document.getElementById("P-" + hash).style.display = "block";
+        $.ajax(
+            {
+                type: 'POST',
+                url: '../Regressor/TrainRegressor?Id=@Model.Id&Hash=' + hash,
+                dataType: 'html',
+                cache: false,
+                async: true,
+                success: function (data) {
+                    document.getElementById("R-" + hash).style.display = "block";
+                    document.getElementById("P-" + hash).style.display = "none";
+                    
+                    
+                },
+
+               
+
+            });
+    }
+</script>

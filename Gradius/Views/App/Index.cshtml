@@ -1,0 +1,528 @@
+﻿@model Gradius.Models.App.AppView
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<html>
+
+
+<head>
+    <link rel="stylesheet" href="~/css/App/AppPage.css" />
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="~/LTE/plugins/fontawesome-free/css/all.min.css">
+    <!-- overlayScrollbars -->
+    <link rel="stylesheet" href="~/LTE/plugins/overlayScrollbars/css/OverlayScrollbars.min.css">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="~/LTE/dist/css/adminlte.min.css">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+
+    <style>
+        #overlay {
+            position: fixed;
+            display: none;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 2;
+            cursor: pointer;
+        }
+
+        #text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            font-size: 30px;
+            color: white;
+            transform: translate(-50%,-50%);
+            -ms-transform: translate(-50%,-50%);
+        }
+
+
+
+    </style>
+</head>
+<body>
+    <div id="overlay">
+
+        <div id="text"><div style="margin-left:22px" class="loader"></div> Calculando...</div>
+    </div>
+    <div id="Filters" style="display:flex; margin-top:10px">
+        <div class="dropdown">
+            <button onclick="showOptions('Ano')" class="btn btn-block btn-info" style="width:180px;margin-left:10px">Ano <i style="float:right" class="fas fa-search"></i></button>
+            <div id="Ano" class="dropdown-content">
+                <input type="text" placeholder="Search.." id="Input-Ano" onkeyup="filterFunction('Ano')">
+
+                @foreach (string Value in Model.FilterOptions.Ano)
+                {
+                    <a href="#@Value" name="Ano" onclick="select('Ano-@Value')" id="Ano-@Value">@Value</a>
+                }
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button onclick="showOptions('Mes')" class="btn btn-block btn-info" style="width:180px;margin-left:10px">Mês <i style="float:right" class="fas fa-search"></i></button>
+            <div id="Mes" class="dropdown-content">
+                <input type="text" placeholder="Search.." id="Input-Mes" onkeyup="filterFunction('Mes')">
+
+                @foreach (string Value in Model.FilterOptions.Mes)
+                {
+                    <a href="#@Value" name="Mes" onclick="select('Mes-@Value')" id="Mes-@Value">@Value</a>
+                }
+            </div>
+        </div>
+
+        <div class="dropdown">
+            <button onclick="showOptions('DiaSemana')" class="btn btn-block btn-info" style="width:180px;margin-left:10px">Dia da Semana <i style="float:right" class="fas fa-search"></i></button>
+            <div id="DiaSemana" class="dropdown-content">
+                <input type="text" placeholder="Search.." id="Input-DiaSemana" onkeyup="filterFunction('DiaSemana')">
+
+                @foreach (string Value in Model.FilterOptions.Mes)
+                {
+                    <a href="#@Value" name="DiaSemana" onclick="select('DiaSemana-@Value')" id="DiaSemana-@Value">@Value</a>
+                }
+            </div>
+        </div>
+
+
+
+        <div>
+            <button onclick="getImageQtd()" class="btn btn-block btn-success" style="width:120px;margin-left:10px"><i class="fas fa-play"></i> Aplicar </button>
+        </div>
+
+    </div>
+
+    <div style="display:flex;margin-top:12px">
+        <div>
+
+            <div id="keyPrice">
+                <div class="col-12 col-sm-6 col-md-3">
+                    <div class="info-box" style="width:250px">
+                        <span class="info-box-icon bg-info elevation-1"><i class="fas fa-dollar-sign"></i></span>
+                        <div class="info-box-content">
+                            <span class="info-box-text">Preço Ideal</span>
+                            <span class="info-box-number">
+                                <label>R$ </label>
+                                <label id="keyPriceValor"></label>
+
+                            </span>
+                        </div>
+                        <!-- /.info-box-content -->
+                    </div>
+                    <!-- /.info-box -->
+                </div>
+                <!-- /.col -->
+            </div>
+
+            <div style="margin-left:10px; margin-top:15px">
+                <hr />
+                <label>Preço Unitário :</label>
+                <input type="number" step="0.01" value="3.00" id="UnitPrice" style="width:250px" class="form-control" onchange="setUnitPrice()" />
+                <hr />
+                <label>Valor Minimo de Venda :</label>
+                <input type="number" step="0.01" value="@Model.Min" id="MinPrice" style="width:250px" class="form-control" onchange="setMinPrice()" />
+                <label>Valor Maximo de Venda :</label>
+                <input type="number" step="0.01" value="@Model.Max" id="MaxPrice" style="width:250px" class="form-control" onchange="setMaxPrice()" />
+            </div>
+
+        </div>
+
+        <div id="Graphs">
+            <div class="card" style="width:950px">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-line"></i>
+                        Analise
+                    </h3>
+                    <div class="card-tools">
+                        <ul class="nav nav-pills ml-auto">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#lucro-chart" data-toggle="tab">Preço x Lucro</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#qtd-chart" data-toggle="tab">Preço x Qtd Vendas</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div><!-- /.card-header -->
+                <div class="card-body">
+                    <div class="tab-content p-0">
+                        <!-- Morris chart - Sales -->
+                        <div class="chart tab-pane active" id="lucro-chart"
+                             style="position: relative; height: 450px;">
+                            <canvas id="effortChart" style="min-height: 450px; height: 450px; max-height: 450px; max-width: 100%;"></canvas>
+                        </div>
+                        <div class="chart tab-pane" id="qtd-chart" style="position: relative; height: 450px;">
+                            <canvas id="qtdChart" style="min-height: 450px; height: 450px; max-height: 450px; max-width: 100%;"></canvas>
+                        </div>
+                    </div>
+                </div><!-- /.card-body -->
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="~/js/Variables.js"></script>
+    <script src="~/js/Operations.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script src="~/LTE/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap -->
+    <script src="~/LTE/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- overlayScrollbars -->
+    <script src="~/LTE/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="~/LTE/dist/js/adminlte.js"></script>
+    <!-- OPTIONAL SCRIPTS -->
+    <script src="~/LTE/dist/js/demo.js"></script>
+    <!-- PAGE PLUGINS -->
+    <!-- jQuery Mapael -->
+    <script src="~/LTE/plugins/jquery-mousewheel/jquery.mousewheel.js"></script>
+
+    <script src="~/LTE/plugins/raphael/raphael.min.js"></script>
+    <script src="~/LTE/plugins/jquery-mapael/jquery.mapael.min.js"></script>
+    <script src="~/LTE/plugins/jquery-mapael/maps/usa_states.min.js"></script>
+    <!-- ChartJS -->
+    <script src="~/LTE/plugins/chart.js/Chart.min.js"></script>
+    <!-- PAGE SCRIPTS -->
+    <script src="~/LTE/dist/js/pages/dashboard2.js"></script>
+    <script>
+/* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+    function showOptions(filterId) {
+        console.log(filterId);
+        document.getElementById(filterId).classList.toggle("show");
+    }
+
+    function filterFunction(filterId) {
+        var input, filter, ul, li, a, i;
+        input = document.getElementById("Input-" + filterId);
+        filter = input.value.toUpperCase();
+        div = document.getElementById(filterId);
+        a = div.getElementsByTagName("a");
+        for (i = 0; i < a.length; i++) {
+            txtValue = a[i].textContent || a[i].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                a[i].style.display = "";
+            } else {
+                a[i].style.display = "none";
+            }
+        }
+    }
+
+    function select(value) {
+        if (document.getElementById(value).className == "value-selected") {
+            document.getElementById(value).className = "value-empty"
+        }
+        else {
+            document.getElementById(value).className = "value-selected"
+        }
+    }
+
+
+    function getImageQtd() {
+        on();
+        var requestBody = {};
+        requestBody["appId"] = '@Model.Id';
+        requestBody["Min"] = MinValor;
+        requestBody["Max"] = MaxValor;
+        requestBody["Step"] = StepValor;
+
+        var filterSelections = {};
+        filterSelections["Ano"] = getSelectedValues('Ano');
+        filterSelections["Mes"] = getSelectedValues('Mes');
+        filterSelections["DiaSemana"] = getSelectedValues('DiaSemana');
+
+        requestBody["FilterOptions"] = filterSelections;
+
+        var settings = {
+            "url": "../App/GetQtdResponse",
+            "method": "POST",
+            "timeout": 0,
+            "headers": {
+                "Content-Type": "application/json"
+
+            },
+            "data": JSON.stringify(requestBody),
+        };
+
+        $.ajax(settings).done(function (response) {
+            console.log(response);
+            off();
+            ImageQtd = response["qtd"];
+            buildAnalysis();
+
+        });
+
+
+
+
+    }
+
+    function buildAnalysis() {
+        generateDomain();
+        ImageEffort = generateEffortImage(DomainValor, ImageQtd, parseFloat(UnitCost));
+        ApicePos = getApicePos();
+        document.getElementById("keyPriceValor").innerHTML = DomainValor[ApicePos].toFixed(2);
+        buildEffortGraph();
+        buildQtdGraph();
+
+    }
+
+    function getSelectedValues(field) {
+
+        var Values = document.getElementsByName(field);
+        var selectedValues = []
+        for (var i = 0; i < Values.length; i++) {
+
+            if (Values[i].className == "value-selected") {
+                selectedValues.push(Values[i].innerHTML);
+            }
+        }
+
+        if (selectedValues.length > 0) {
+            return selectedValues;
+        }
+        else {
+            return null;
+        }
+    }
+
+    function generateDomain() {
+        var domain = [];
+        var value = parseFloat(MinValor);
+        while (value < parseFloat(MaxValor)) {
+
+            domain.push(value);
+            value += parseFloat(StepValor);
+        }
+        DomainValor = domain;
+    }
+
+    function setUnitPrice() {
+        UnitCost = document.getElementById("UnitPrice").value;
+        buildAnalysis();
+    }
+
+    function setMinPrice() {
+        MinValor = document.getElementById("MinPrice").value;
+
+    }
+
+    function setMaxPrice() {
+        MaxValor = document.getElementById("MaxPrice").value;
+
+    }
+    function Init() {
+        MinValor = '@Model.Min';
+        MaxValor = '@Model.Max';
+        StepValor = '0.01';
+        UnitCost = '3.00';
+    }
+
+    Init();
+    </script>
+
+    <script>
+        function buildEffortGraph() {
+            /* ChartJS
+                * -------
+                * Here we will create a few charts using ChartJS
+                */
+
+            //--------------
+            //- AREA CHART -
+            //--------------
+
+            // Get context with jQuery - using jQuery's .get() method.
+
+            var effortCanvas = document.getElementById("effortChart");
+            var pEffortCanvas = effortCanvas.parentElement;
+            effortCanvas.remove();
+            var newEffortCanvas = document.createElement("canvas");
+            newEffortCanvas.setAttribute("id", "effortChart");
+            newEffortCanvas.style.minHeight = '450px';
+            newEffortCanvas.style.height = '450px';
+            newEffortCanvas.style.maxHeight = '450px';
+            newEffortCanvas.style.maxWidth = '100%';
+            pEffortCanvas.appendChild(newEffortCanvas);
+            // <canvas id="effortChart" style="min-height: 450px; height: 450px; max-height: 450px; max-width: 100%;"></canvas>
+
+
+            var labels = [];
+            for (var i = 0; i < ImageQtd.length; i++) {
+                labels.push(DomainValor[i].toFixed(2).toString());
+            }
+
+            var areaChartData = {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Lucro',
+                        backgroundColor: 'rgba(60,141,188,0.9)',
+                        borderColor: 'rgba(60,141,188,0.8)',
+                        pointRadius: false,
+                        pointColor: '#3b8bba',
+                        pointStrokeColor: 'rgba(60,141,188,1)',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(60,141,188,1)',
+                        data: ImageEffort
+                    }
+                ]
+            }
+
+            var areaChartOptions = {
+                maintainAspectRatio: false,
+                responsive: true,
+                legend: {
+                    display: false
+                },
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            display: false,
+                        }
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            display: false,
+                        }
+                    }]
+                }
+            }
+
+            // This will get the first returned node in the jQuery collection.
+
+
+            //-------------
+            //- LINE CHART -
+            //--------------
+
+            var lineChartCanvas = $('#effortChart').get(0).getContext('2d')
+            var lineChartOptions = jQuery.extend(true, {}, areaChartOptions)
+            var lineChartData = jQuery.extend(true, {}, areaChartData)
+            lineChartData.datasets[0].fill = false;
+            // lineChartData.datasets[1].fill = false;
+            lineChartOptions.datasetFill = false
+
+            var lineChart = new Chart(lineChartCanvas, {
+                type: 'line',
+                data: lineChartData,
+                options: lineChartOptions
+            })
+
+            //-------------
+            //- DONUT CHART -
+            //-------------
+            // Get context with jQuery - using jQuery's .get() method.
+        }
+
+        function buildQtdGraph() {
+            /* ChartJS
+                * -------
+                * Here we will create a few charts using ChartJS
+                */
+
+            //--------------
+            //- AREA CHART -
+            //--------------
+
+            // Get context with jQuery - using jQuery's .get() method.
+
+            var qtdCanvas = document.getElementById("qtdChart");
+            var pQtdCanvas = qtdCanvas.parentElement;
+            qtdCanvas.remove();
+            var newQtdCanvas = document.createElement("canvas");
+            newQtdCanvas.setAttribute("id", "qtdChart");
+            newQtdCanvas.style.minHeight = '450px';
+            newQtdCanvas.style.height = '450px';
+            newQtdCanvas.style.maxHeight = '450px';
+            newQtdCanvas.style.maxWidth = '100%';
+            pQtdCanvas.appendChild(newQtdCanvas);
+            // <canvas id="effortChart" style="min-height: 450px; height: 450px; max-height: 450px; max-width: 100%;"></canvas>
+
+
+            var labels = [];
+            for (var i = 0; i < ImageQtd.length; i++) {
+                labels.push(DomainValor[i].toFixed(2).toString());
+            }
+
+            var areaChartData = {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Qtd',
+                        backgroundColor: 'rgba(60,141,188,0.9)',
+                        borderColor: 'rgba(60,141,188,0.8)',
+                        pointRadius: false,
+                        pointColor: '#3b8bba',
+                        pointStrokeColor: 'rgba(60,141,188,1)',
+                        pointHighlightFill: '#fff',
+                        pointHighlightStroke: 'rgba(60,141,188,1)',
+                        data: ImageQtd
+                    }
+                ]
+            }
+
+            var areaChartOptions = {
+                maintainAspectRatio: false,
+                responsive: true,
+                legend: {
+                    display: false
+                },
+                scales: {
+                    xAxes: [{
+                        gridLines: {
+                            display: false,
+                        }
+                    }],
+                    yAxes: [{
+                        gridLines: {
+                            display: false,
+                        }
+                    }]
+                }
+            }
+
+            // This will get the first returned node in the jQuery collection.
+
+
+            //-------------
+            //- LINE CHART -
+            //--------------
+
+            var lineChartCanvas = $('#qtdChart').get(0).getContext('2d')
+            var lineChartOptions = jQuery.extend(true, {}, areaChartOptions)
+            var lineChartData = jQuery.extend(true, {}, areaChartData)
+            lineChartData.datasets[0].fill = false;
+            // lineChartData.datasets[1].fill = false;
+            lineChartOptions.datasetFill = false
+
+            var lineChart = new Chart(lineChartCanvas, {
+                type: 'line',
+                data: lineChartData,
+                options: lineChartOptions
+            })
+
+            //-------------
+            //- DONUT CHART -
+            //-------------
+            // Get context with jQuery - using jQuery's .get() method.
+        }
+
+    </script>
+    <script>
+        function on() {
+            document.getElementById("overlay").style.display = "block";
+        }
+
+        function off() {
+            document.getElementById("overlay").style.display = "none";
+        }
+    </script>
+</body>
+</html>
